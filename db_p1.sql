@@ -8,6 +8,21 @@ CREATE TABLE usuario (
     PRIMARY KEY (email)
 );
 
+CREATE TABLE endereco (
+	id INT NOT NULL AUTO_INCREMENT,
+	cidade VARCHAR(40) NOT NULL,
+    rua	   VARCHAR(40) NOT NULL,
+    numero VARCHAR(40) NOT NULL,
+    complemento VARCHAR(40),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE residencia (
+	email VARCHAR(40) NOT NULL,
+    id 	  VARCHAR(40) NOT NULL,
+    PRIMARY KEY (email, id)
+);
+
 CREATE TABLE passaro (
     nome VARCHAR(30) NOT NULL,
     PRIMARY KEY (nome)
