@@ -5,7 +5,6 @@ USE bird_box;
 CREATE TABLE usuario (
     nome VARCHAR(30) NOT NULL,
     email VARCHAR(40) NOT NULL,
-    id_endereco INT NOT NULL,
     cidade VARCHAR(40) NOT NULL,
     PRIMARY KEY (email)
 );
