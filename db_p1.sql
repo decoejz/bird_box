@@ -2,25 +2,22 @@ DROP DATABASE IF EXISTS bird_box;
 CREATE DATABASE bird_box;
 USE bird_box;
 
-CREATE TABLE usuario (
-    nome VARCHAR(30) NOT NULL,
-    email VARCHAR(40) NOT NULL,
-    PRIMARY KEY (email)
-);
-
 CREATE TABLE endereco (
-	id INT NOT NULL AUTO_INCREMENT,
+	id_endereco INT NOT NULL AUTO_INCREMENT,
 	cidade VARCHAR(40) NOT NULL,
     rua	   VARCHAR(40) NOT NULL,
     numero VARCHAR(40) NOT NULL,
     complemento VARCHAR(40),
-    PRIMARY KEY (id)
+    PRIMARY KEY (id_endereco)
 );
 
-CREATE TABLE residencia (
-	email VARCHAR(40) NOT NULL,
-    id 	  VARCHAR(40) NOT NULL,
-    PRIMARY KEY (email, id)
+CREATE TABLE usuario (
+    nome VARCHAR(30) NOT NULL,
+    email VARCHAR(40) NOT NULL,
+    id_endereco INT NOT NULL,
+    PRIMARY KEY (email),
+    FOREIGN KEY (id_endereco)
+		REFERENCES endereco(id_endereco)
 );
 
 CREATE TABLE passaro (
