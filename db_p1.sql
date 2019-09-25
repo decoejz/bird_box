@@ -39,6 +39,7 @@ CREATE TABLE post(
 CREATE TABLE usuario_post(
 	email VARCHAR(40) NOT NULL,
     id INT NOT NULL,
+    ativo INT NOT NULL DEFAULT 1,
     PRIMARY KEY (email, id),
 	FOREIGN KEY (email)
 		REFERENCES usuario(email),
@@ -49,6 +50,7 @@ CREATE TABLE usuario_post(
 CREATE TABLE tag_usuario(
 	email VARCHAR(40) NOT NULL,
     id INT NOT NULL,
+    ativo INT NOT NULL DEFAULT 1,
     PRIMARY KEY (email, id),
 	FOREIGN KEY (email)
 		REFERENCES usuario(email),
@@ -59,6 +61,7 @@ CREATE TABLE tag_usuario(
 CREATE TABLE tag_passaro(
 	nome VARCHAR(40) NOT NULL,
     id INT NOT NULL,
+    ativo INT NOT NULL DEFAULT 1,
     PRIMARY KEY (nome, id),
 	FOREIGN KEY (nome)
 		REFERENCES passaro(nome),
@@ -73,6 +76,7 @@ CREATE TABLE usuario_viu(
     ip VARCHAR(15),
 	browser VARCHAR(20),
     visto_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ativo INT NOT NULL DEFAULT 1,
     PRIMARY KEY (email, id),
 	FOREIGN KEY (email)
 		REFERENCES usuario(email),
