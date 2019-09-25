@@ -1,1 +1,2 @@
-# bird_box
+# Bird Box
+Projeto 1 da disciplina de Megadados
