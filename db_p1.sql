@@ -36,17 +36,6 @@ CREATE TABLE post(
 		REFERENCES usuario(email)
 );
 
-CREATE TABLE usuario_post(
-	email VARCHAR(40) NOT NULL,
-    id INT NOT NULL,
-    ativo INT NOT NULL DEFAULT 1,
-    PRIMARY KEY (email, id),
-	FOREIGN KEY (email)
-		REFERENCES usuario(email),
-	FOREIGN KEY (id)
-		REFERENCES post(id)
-);
-
 CREATE TABLE tag_usuario(
 	email VARCHAR(40) NOT NULL,
     id INT NOT NULL,
