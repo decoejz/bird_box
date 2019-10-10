@@ -2,22 +2,11 @@ DROP DATABASE IF EXISTS bird_box;
 CREATE DATABASE bird_box;
 USE bird_box;
 
-CREATE TABLE endereco (
-	id_endereco INT NOT NULL AUTO_INCREMENT,
-	cidade VARCHAR(40) NOT NULL,
-    rua	   VARCHAR(40) NOT NULL,
-    numero VARCHAR(40) NOT NULL,
-    complemento VARCHAR(40),
-    PRIMARY KEY (id_endereco)
-);
-
 CREATE TABLE usuario (
     nome VARCHAR(30) NOT NULL,
     email VARCHAR(40) NOT NULL,
-    id_endereco INT NOT NULL,
-    PRIMARY KEY (email),
-    FOREIGN KEY (id_endereco)
-		REFERENCES endereco(id_endereco)
+    cidade VARCHAR(40) NOT NULL,
+    PRIMARY KEY (email)
 );
 
 CREATE TABLE passaro (
@@ -47,19 +36,10 @@ CREATE TABLE post(
 		REFERENCES usuario(email)
 );
 
-CREATE TABLE usuario_post(
-	email VARCHAR(40) NOT NULL,
-    id INT NOT NULL,
-    PRIMARY KEY (email, id),
-	FOREIGN KEY (email)
-		REFERENCES usuario(email),
-	FOREIGN KEY (id)
-		REFERENCES post(id)
-);
-
 CREATE TABLE tag_usuario(
 	email VARCHAR(40) NOT NULL,
     id INT NOT NULL,
+    ativo INT NOT NULL DEFAULT 1,
     PRIMARY KEY (email, id),
 	FOREIGN KEY (email)
 		REFERENCES usuario(email),
@@ -70,6 +50,7 @@ CREATE TABLE tag_usuario(
 CREATE TABLE tag_passaro(
 	nome VARCHAR(40) NOT NULL,
     id INT NOT NULL,
+    ativo INT NOT NULL DEFAULT 1,
     PRIMARY KEY (nome, id),
 	FOREIGN KEY (nome)
 		REFERENCES passaro(nome),
@@ -84,6 +65,7 @@ CREATE TABLE usuario_viu(
     ip VARCHAR(15),
 	browser VARCHAR(20),
     visto_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ativo INT NOT NULL DEFAULT 1,
     PRIMARY KEY (email, id),
 	FOREIGN KEY (email)
 		REFERENCES usuario(email),
