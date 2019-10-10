@@ -68,8 +68,7 @@ def adiciona_post(conn, titulo, texto, url, email):
 def adiciona_tag_usuario(conn, email, id):
     with conn.cursor() as cursor:
         try:
-            cursor.execute('INSERT INTO tag_usuario (email, id)\
-                 VALUES (%s, %s)', (email, id))
+            cursor.execute('CALL add_tag_usuario(%s, %s)', (email, id))
         except pymysql.err.IntegrityError as e:
             raise ValueError(f'Não posso adicionar a tag {email} na tabela tag_usuario')
 
