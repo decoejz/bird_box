@@ -68,17 +68,28 @@ class TestCase(unittest.TestCase):
         conn = self.__class__.connection
         
         titulo = "pudim amassado"
-        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayrezard"
+        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayres@linkadinho.inspermon.br"
         url    = "https://i.ytimg.com/vi/vdBFctcEzOM/maxresdefault.jpg"
         email  = "wesgas@al.insper.edu"
         nome = "André"
         cidade="Orlândia"
-        
-        adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
-        adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
+        #Testa também os shouts e tags
 
-        target = acha_post(conn, titulo=titulo, email=email)
-        self.assertIsNotNone(target)
+        adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
+        #Cria USER pra ser tageado
+        adiciona_usuario(conn, nome="ayrezard", email="ayres@linkadinho.inspermon.br",cidade="megadadolis")
+        
+        adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
+        
+        # log = logging.getLogger("add_post")
+        # log.debug("Message")
+        post_id = acha_post_id(conn, titulo=titulo, email=email)
+        self.assertIsNotNone(post_id)
+        target = acha_shout(conn, post_id=post_id)
+        self.assertEqual(target[0][0], "ayres@linkadinho.inspermon.br")
+
+        target = acha_tag(conn, post_id)
+        self.assertEqual(target[0][0],"dragões")
 
         target = acha_post(conn, titulo="Morreu", email=email)
         self.assertIsNone(target)
@@ -88,13 +99,15 @@ class TestCase(unittest.TestCase):
         conn = self.__class__.connection
         
         titulo = "pudim amassado"
-        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayrezard"
+        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayres@linkadinho.inspermon.br"
         url    = "https://i.ytimg.com/vi/vdBFctcEzOM/maxresdefault.jpg"
         email  = "wesgas@al.insper.edu"
-        nome = "André"
-        cidade="Orlândia"
+        nome   = "André"
+        cidade = "Orlândia"
         
         adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
+        adiciona_usuario(conn, nome="ayrezard", email="ayres@linkadinho.inspermon.br",cidade="megadadolis")
+
         adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
 
         target = acha_post(conn, titulo=titulo, email=email)
