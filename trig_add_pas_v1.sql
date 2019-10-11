@@ -21,11 +21,12 @@ BEGIN
 	IF NOT(NEW.nome IN (SELECT * FROM passaro)) THEN
 		INSERT INTO passaro (nome) VALUES (NEW.nome);
 	END IF;
-END;
+END //
 
+DELIMITER //
 CREATE PROCEDURE add_tag_usuario(IN email VARCHAR(40), id INT)
 BEGIN
-    IF (email IN (SELECT email FROM usuario)) THEN
+    IF (email IN (SELECT * FROM usuario)) THEN
 		INSERT INTO tag_usuario (email, id) VALUES (email, id);
 	END IF;
 END//
