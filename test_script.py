@@ -18,7 +18,6 @@ class TestCase(unittest.TestCase):
             password=config['PASS'],
             database='bird_box'
         )
-        
     
     @classmethod
     def tearDownClass(cls):
@@ -29,7 +28,16 @@ class TestCase(unittest.TestCase):
         with conn.cursor() as cursor:
             cursor.execute('START TRANSACTION')
         with open('db_p1.sql', 'rb') as f:
-            res = subprocess.run(f'mysql -u root -proot'.split(), stdin=f, capture_output=True)
+            res = subprocess.run(
+            [
+                config['MYSQL'], 
+                '-u', config['USER'], 
+                '-p' + config['PASS'], 
+                '-h', config['HOST']
+            ], 
+            stdin=f
+            )  
+            # res = subprocess.run(f'mysql -u root -proot'.split(), stdin=f, capture_output=True)
             log = logging.getLogger("setup")
             log.debug(res)
     
@@ -48,11 +56,31 @@ class TestCase(unittest.TestCase):
 
         target = acha_usuario(conn, "Vesly")
         self.assertIsNone(target)
-        
+    
+    def test_declara_preferencias():
+        pass
+
+    def test_adiciona_post():
+        pass
+
+    def test_remove_post():
+        pass
+
+    def test_viu():
+        pass
+
+    def test_desable_all():
+        pass
+
+    def test_lista_post():
+        pass
+
+    def test_lista_usuario():
+        pass
 
 if(__name__ == "__main__"):
     global config
-    with open('config_tests.json') as f:
+    with open('config_testes.json') as f:
         config = json.load(f)
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
     unittest.main()
