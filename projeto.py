@@ -36,12 +36,29 @@ def lista_usuarios(conn):
         usuarios = tuple(x[0] for x in res)
         return usuarios
 
-def adiciona_preferencia(conn, nome_passaro, email):
+def adiciona_preferencia(conn, passaro, email):
     with conn.cursor() as cursor:
         cursor.execute("""INSERT INTO preferencia
-                          (email, nome)
+                            (email, nome)
                           VALUES 
-                          (%s,%s)""", (email, nome_passaro))
+                            (%s,%s)""", (email, passaro))
+
+def acha_preferencia(conn, email, passaro):
+    with conn.cursor() as cursor:
+        cursor.execute("""SELECT 
+                            * 
+                          FROM
+                            usuario INNER JOIN preferencia USING(email)
+                            INNER JOIN passaro ON passaro.nome=preferencia.nome
+                          WHERE
+                            email=%s AND passaro.nome=%s
+                          """, (email, passaro))
+        res = cursor.fetchone()
+        if res:
+            return res[0]
+        else:
+            return None
+
 
 ### ACOES RELACIONADAS AS VISUALIZACOES
 def adiciona_viu(conn, email, id_post, so, ip, browser):
@@ -61,6 +78,25 @@ def parser_texto(conn, texto, id):
         if(word[0] == '@'):
             adiciona_tag_usuario(conn, word[1:], id)
 
+def acha_post(conn, titulo, email):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM post WHERE titulo=%s AND email=%s", (titulo, email))
+        res = cursor.fetchone()
+        if res:
+            return res
+        else:
+            return None
+def post_esta_ativo(conn, titulo, email):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM post WHERE titulo=%s AND email=%s", (titulo, email))
+        res = cursor.fetchone()
+        if res:
+            return res[4]
+        else:
+            return None
+def acha_post_id(conn, titulo, email):
+    
+
 def adiciona_post(conn, titulo, texto, url, email):
     with conn.cursor() as cursor:
         try:
@@ -70,11 +106,11 @@ def adiciona_post(conn, titulo, texto, url, email):
             id_post = cursor.fetchone()
             parser_texto(conn, texto, id_post)
         except pymysql.err.IntegrityError as e:
-            raise ValueError(f'Não posso adicionar o post {titulo} de {email} na tabela post')
+            raise ValueError(f'Não posso adicionar o post {titulo} de {email} na tabela post; Erro: {e}')
 
-def remove_post(conn, id):
+def remove_post(conn, titulo, email):
     with conn.cursor() as cursor:
-        cursor.execute("UPDATE post SET ativo = 0 WHERE id=%s", id)
+        cursor.execute("UPDATE post SET ativo = 0 WHERE titulo=%s AND email=%s", (titulo, email))
 
 def adiciona_tag_usuario(conn, email, id):
     with conn.cursor() as cursor:

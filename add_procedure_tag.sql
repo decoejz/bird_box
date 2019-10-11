@@ -1,3 +1,4 @@
+USE bird_box;
 DROP PROCEDURE IF EXISTS add_tag_usuario;
 
 DELIMITER //
