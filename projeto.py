@@ -36,6 +36,13 @@ def lista_usuarios(conn):
         usuarios = tuple(x[0] for x in res)
         return usuarios
 
+def adiciona_preferencia(conn, nome_passaro, email):
+    with conn.cursor() as cursor:
+        cursor.execute("""INSERT INTO preferencia
+                          (email, nome)
+                          VALUES 
+                          (%s,%s)""", (email, nome_passaro))
+
 ### ACOES RELACIONADAS AS VISUALIZACOES
 def adiciona_viu(conn, email, id_post, so, ip, browser):
     with conn.cursor() as cursor:
@@ -64,6 +71,10 @@ def adiciona_post(conn, titulo, texto, url, email):
             parser_texto(conn, texto, id_post)
         except pymysql.err.IntegrityError as e:
             raise ValueError(f'Não posso adicionar o post {titulo} de {email} na tabela post')
+
+def remove_post(conn, id):
+    with conn.cursor() as cursor:
+        cursor.execute("UPDATE post SET ativo = 0 WHERE id=%s", id)
 
 def adiciona_tag_usuario(conn, email, id):
     with conn.cursor() as cursor:

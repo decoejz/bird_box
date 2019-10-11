@@ -29,3 +29,4 @@ BEGIN
 		INSERT INTO tag_usuario (email, id) VALUES (email, id);
 	END IF;
 END//
+DELIMITER ;
