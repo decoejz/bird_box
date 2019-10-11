@@ -2,7 +2,6 @@ USE bird_box;
 
 DROP TRIGGER IF EXISTS add_passaro_from_tag;
 DROP TRIGGER IF EXISTS add_passaro_from_preferencia;
-DROP PROCEDURE IF EXISTS add_tag_usuario;
 
 DELIMITER //
 CREATE TRIGGER add_passaro_from_tag
@@ -22,12 +21,3 @@ BEGIN
 		INSERT INTO passaro (nome) VALUES (NEW.nome);
 	END IF;
 END //
-
-DELIMITER //
-CREATE PROCEDURE add_tag_usuario(IN email VARCHAR(40), id INT)
-BEGIN
-    IF (email IN (SELECT * FROM usuario)) THEN
-		INSERT INTO tag_usuario (email, id) VALUES (email, id);
-	END IF;
-END//
-DELIMITER ;
