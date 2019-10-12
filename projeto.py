@@ -93,6 +93,13 @@ def parser_texto(conn, texto, id):
             except:
                 pass 
 
+def lista_post(conn):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT id FROM post')
+        res = cursor.fetchall()
+        posts = tuple(x[0] for x in res)
+        return posts
+
 def acha_post(conn, titulo, email):
     with conn.cursor() as cursor:
         cursor.execute("SELECT * FROM post WHERE titulo=%s AND email=%s", (titulo, email))

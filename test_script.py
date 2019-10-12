@@ -164,38 +164,83 @@ class TestCase(unittest.TestCase):
         adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
 
         post_id = acha_post(conn, titulo=titulo, email=email)
-        adiciona_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0], so="ubuntu", ip="192.168.0.1", browser="Internet Explorer")
-        adiciona_viu(conn, email="john@smith.com", id_post=post_id[0], so="yana", ip="13", browser="Tardis Explorer")
+        post_id = post_id[0]
+        adiciona_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id, so="ubuntu", ip="192.168.0.1", browser="Internet Explorer")
+        adiciona_viu(conn, email="john@smith.com", id_post=post_id, so="yana", ip="13", browser="Tardis Explorer")
         
         #Testa a remocao de um post e suas dependencias
         target = remove_post(conn, titulo=titulo, email=email)
         self.assertIsNone(target)
 
-        post = acha_post(conn, titulo=titulo, email=email)
-        self.assertEqual(post[4], 0)
+        atividade = post_esta_ativo(conn, titulo=titulo, email=email)
+        self.assertEqual(atividade, 0)
 
-        atividade = acha_tag(conn, post[0])
+        atividade = acha_tag(conn, post_id)
         for i in atividade:
             self.assertEqual(i[2], 0)
 
-        atividade = acha_shout(conn, post_id[0])
+        atividade = acha_shout(conn, post_id)
         for i in atividade:
             self.assertEqual(i[2], 0)
 
-        atividade = acha_viu(conn, email="john@smith.com", id_post=post_id[0])
+        atividade = acha_viu(conn, email="john@smith.com", id_post=post_id)
         self.assertEqual(atividade[6], 0)
 
-        atividade = acha_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0])
+        atividade = acha_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id)
         self.assertEqual(atividade[6], 0)
 
-    @unittest.skip('Em desenvolvimento.')
-    def test_lista_post(self):
-        pass
-
-    @unittest.skip('Em desenvolvimento.')
+    # @unittest.skip('Em desenvolvimento.')
     def test_lista_usuario(self):
-        pass
+        conn = self.__class__.connection
+        
+        nome   = "André"
+        cidade = "Orlândia"
+        usuarios_email = ["wesgas@al.insper.edu", "ayres@linkadinho.inspermon.br", "john@smith.com", "han@solo.com"]
+        
+        #Testa que ainda nao tem usuarios
+        target = lista_usuarios(conn)
+        self.assertFalse(target)
 
+        adiciona_usuario(conn, nome=nome, email=usuarios_email[0], cidade=cidade)
+        adiciona_usuario(conn, nome="ayrezard", email=usuarios_email[1],cidade="megadadolis")
+        adiciona_usuario(conn, nome="John Smith", email=usuarios_email[2], cidade="TARDIS")
+        adiciona_usuario(conn, nome="Han", email=usuarios_email[3], cidade="Corellia")
+
+        target = lista_usuarios(conn)
+        self.assertCountEqual(target, usuarios_email)
+
+        for i in usuarios_email:
+            remove_usuario(conn, i)
+
+        target = lista_usuarios(conn)
+        self.assertFalse(target)
+
+    # @unittest.skip('Em desenvolvimento.')
+    def test_lista_post(self):
+        conn = self.__class__.connection
+        
+        titulo = "pudim amassado"
+        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayres@linkadinho.inspermon.br"
+        url    = "https://i.ytimg.com/vi/vdBFctcEzOM/maxresdefault.jpg"
+        nome   = "André"
+        cidade = "Orlândia"
+        usuarios_email = ["wesgas@al.insper.edu", "ayres@linkadinho.inspermon.br"]
+        
+        adiciona_usuario(conn, nome=nome, email=usuarios_email[0], cidade=cidade)
+        adiciona_usuario(conn, nome="ayrezard", email=usuarios_email[1],cidade="megadadolis")
+        
+        target = lista_post(conn)
+        self.assertFalse(target)
+
+        adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=usuarios_email[0])
+        adiciona_post(conn,titulo="Tem uma cobra na minha bota", texto="Tinha uma cobra na bota do pobre menina", url = url, email=usuarios_email[1])
+
+        posts_id = []
+        posts_id.append(acha_post_id(conn, titulo, usuarios_email[0]))
+        posts_id.append(acha_post_id(conn, "Tem uma cobra na minha bota", usuarios_email[1]))
+
+        target = lista_post(conn)
+        self.assertCountEqual(target, posts_id)
 
 def run_sql_script(filename):
     global config
@@ -211,7 +256,7 @@ def run_sql_script(filename):
         )
 
 def setUpModule():
-    filenames = ["db_p1.sql", "add_procedure_tag.sql", "trig_add_pas_v1.sql", "trigg_delete_post.sql"]
+    filenames = ["db_p1.sql", "trig_add_pas_v1.sql", "trigg_delete_post.sql"]
     for filename in filenames:
         run_sql_script(filename)
 
