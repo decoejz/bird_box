@@ -120,13 +120,73 @@ class TestCase(unittest.TestCase):
         target = post_esta_ativo(conn, titulo=titulo, email=email)
         self.assertEqual(target, 0)
 
-    @unittest.skip('Em desenvolvimento.')
+    #@unittest.skip('Em desenvolvimento.')
     def test_viu(self):
-        pass
+        conn = self.__class__.connection
+        
+        titulo = "pudim amassado"
+        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayres@linkadinho.inspermon.br"
+        url    = "https://i.ytimg.com/vi/vdBFctcEzOM/maxresdefault.jpg"
+        email  = "wesgas@al.insper.edu"
+        nome   = "André"
+        cidade = "Orlândia"
+        
+        adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
+        adiciona_usuario(conn, nome="ayrezard", email="ayres@linkadinho.inspermon.br",cidade="megadadolis")
 
-    @unittest.skip('Em desenvolvimento.')
+        adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
+
+        post_id = acha_post(conn, titulo=titulo, email=email)
+
+        #Teste que verifica se uma visualizacao foi inserida corretamente
+        target = adiciona_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0], so="ubuntu", ip="192.168.0.1", browser="Internet Explorer")
+        self.assertIsNone(target)
+
+        #Testa se e possivel encontrar a visualizacao
+        target = acha_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0])
+        self.assertIsNotNone(target)
+
+    #@unittest.skip('Em desenvolvimento.')
     def test_desable_all(self):
-        pass
+        conn = self.__class__.connection
+        
+        titulo = "pudim amassado"
+        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayres@linkadinho.inspermon.br e o @john@smith.com"
+        url    = "https://i.ytimg.com/vi/vdBFctcEzOM/maxresdefault.jpg"
+        email  = "wesgas@al.insper.edu"
+        nome   = "André"
+        cidade = "Orlândia"
+        
+        adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
+        adiciona_usuario(conn, nome="ayrezard", email="ayres@linkadinho.inspermon.br",cidade="megadadolis")
+        adiciona_usuario(conn, nome="John Smith", email="john@smith.com", cidade="TARDIS")
+
+        adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
+
+        post_id = acha_post(conn, titulo=titulo, email=email)
+        adiciona_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0], so="ubuntu", ip="192.168.0.1", browser="Internet Explorer")
+        adiciona_viu(conn, email="john@smith.com", id_post=post_id[0], so="yana", ip="13", browser="Tardis Explorer")
+        
+        #Testa a remocao de um post e suas dependencias
+        target = remove_post(conn, titulo=titulo, email=email)
+        self.assertIsNone(target)
+
+        post = acha_post(conn, titulo=titulo, email=email)
+        self.assertEqual(post[4], 0)
+
+        atividade = acha_tag(conn, post[0])
+        for i in atividade:
+            self.assertEqual(i[2], 0)
+
+        atividade = acha_shout(conn, post_id[0])
+        for i in atividade:
+            self.assertEqual(i[2], 0)
+
+        atividade = acha_viu(conn, email="john@smith.com", id_post=post_id[0])
+        self.assertEqual(atividade[6], 0)
+
+        atividade = acha_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0])
+        self.assertEqual(atividade[6], 0)
 
     @unittest.skip('Em desenvolvimento.')
     def test_lista_post(self):

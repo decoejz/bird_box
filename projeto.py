@@ -69,6 +69,15 @@ def adiciona_viu(conn, email, id_post, so, ip, browser):
         except pymysql.err.IntegrityError as e:
             raise ValueError(f'Não posso adicionar visualizacao de {email} na tabela usuario_viu. Error: {e}')
 
+def acha_viu(conn, email, id_post):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM usuario_viu WHERE email=%s AND id=%s", (email, id_post))
+        res = cursor.fetchone()
+        if res:
+            return res
+        else:
+            return None
+
 ### ACOES RELACIONADAS A POSTS
 def parser_texto(conn, texto, id):
     #Separa cada palavra do comentario para ser parseada e procurar as tags
