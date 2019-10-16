@@ -1,9 +1,19 @@
 # Bird Box
 Projeto 1 da disciplina de Megadados
 
+|Membros|
+|---------|
+|André Ejzenmesser|
+|Wesley Gabriel Albano da Silva|
 
- - Endereço para nosso diagrama de entidades-relações:
-    https://drive.google.com/file/d/14Aw5jEdRLVDuKC6VetOBY1sPuQxSqYRb/view?usp=sharing
 
- - Endereço para o modelo relacional:
-    
+## Modelo Entidade Relacionamento
+![Imagem Indisponível](https://github.com/decoejz/bird_box/blob/master/img/ent_rela.PNG)
+
+## Modelo Relacional
+
+![Imagem Indisponível](https://github.com/decoejz/bird_box/blob/master/img/modelo-relacional.PNG)
+
+## Dicionário de Dados
+
+![Imagem Indisponível](https://github.com/decoejz/bird_box/blob/master/img/dicionario.PNG)

@@ -256,7 +256,10 @@ def run_sql_script(filename):
         )
 
 def setUpModule():
-    filenames = ["db_p1.sql", "trig_add_pas_v1.sql", "trigg_delete_post.sql"]
+    #filenames = ["db_p1.sql", "trig_add_pas_v1.sql", "trigg_delete_post.sql"]
+    os.chdir('sql')
+    filenames = [entry for entry in os.listdir() 
+        if os.path.isfile(entry) and re.match(r'.*_\d{3}\.sql', entry)]
     for filename in filenames:
         run_sql_script(filename)
 
@@ -264,6 +267,5 @@ if(__name__ == "__main__"):
     global config
     with open('config_testes.json') as f:
         config = json.load(f)
-    setUpModule()
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
     unittest.main(verbosity=2)
