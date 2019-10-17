@@ -40,11 +40,21 @@ class TestCase(unittest.TestCase):
         email="wesgas@al.insper.edu"
         cidade="Orlândia"
         
+        #Adiciona um usuario
         adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
 
+        #Verifica se um usuario pode ser adicionado duas vezes
+        try:
+            adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
+            self.fail('Não deveria ter adicionado o mesmo usuário duas vezes')
+        except:
+            pass
+
+        #Checa se o usuario existe
         target = acha_usuario(conn, nome)
         self.assertIsNotNone(target)
 
+        #Tenta achar um usuario inexistente
         target = acha_usuario(conn, "Vesly")
         self.assertIsNone(target)
     
@@ -261,7 +271,8 @@ def setUpModule():
     filenames = [entry for entry in os.listdir() 
         if os.path.isfile(entry) and re.match(r'.*_\d{3}\.sql', entry)]
     for filename in filenames:
-        run_sql_script(filename)
+        if not (filename == "script_007.sql"):
+            run_sql_script(filename)
 
 if(__name__ == "__main__"):
     global config
