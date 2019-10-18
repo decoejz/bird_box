@@ -70,8 +70,19 @@ class TestCase(unittest.TestCase):
         adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
         adiciona_preferencia(conn, passaro=passaro, email=email)
 
+        #Tenta adicionar a mesma preferencia duas vezes
+        try:
+            adiciona_preferencia(conn, passaro=passaro, email=email)
+            self.fail('Não deveria ter adicionado a mesma preferencia duas vezes')
+        except:
+            pass
+
         target = acha_preferencia(conn, email=email, passaro=passaro)
         self.assertIsNotNone(target)
+
+        #Tenta achar um usuario inexistente
+        target = acha_preferencia(conn, email=email, passaro="sabia")
+        self.assertIsNone(target)
        
     #@unittest.skip('Em desenvolvimento.')
     def test_adiciona_post(self):
@@ -83,16 +94,15 @@ class TestCase(unittest.TestCase):
         email  = "wesgas@al.insper.edu"
         nome = "André"
         cidade="Orlândia"
-        #Testa também os shouts e tags
 
+        #Testa também os shouts e tags
         adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
+        
         #Cria USER pra ser tageado
         adiciona_usuario(conn, nome="ayrezard", email="ayres@linkadinho.inspermon.br",cidade="megadadolis")
         
         adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
         
-        # log = logging.getLogger("add_post")
-        # log.debug("Message")
         post_id = acha_post_id(conn, titulo=titulo, email=email)
         self.assertIsNotNone(post_id)
         target = acha_shout(conn, post_id=post_id)
@@ -101,34 +111,9 @@ class TestCase(unittest.TestCase):
         target = acha_tag(conn, post_id)
         self.assertEqual(target[0][0],"dragões")
 
+        #Tenta encontrar um post que nao existe
         target = acha_post(conn, titulo="Morreu", email=email)
         self.assertIsNone(target)
-
-    #@unittest.skip('Em desenvolvimento.')
-    def test_remove_post(self):
-        conn = self.__class__.connection
-        
-        titulo = "pudim amassado"
-        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayres@linkadinho.inspermon.br"
-        url    = "https://i.ytimg.com/vi/vdBFctcEzOM/maxresdefault.jpg"
-        email  = "wesgas@al.insper.edu"
-        nome   = "André"
-        cidade = "Orlândia"
-        
-        adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
-        adiciona_usuario(conn, nome="ayrezard", email="ayres@linkadinho.inspermon.br",cidade="megadadolis")
-
-        adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
-
-        target = acha_post(conn, titulo=titulo, email=email)
-        self.assertIsNotNone(target)
-        target = post_esta_ativo(conn, titulo=titulo, email=email)
-        self.assertEqual(target, 1)
-        
-        remove_post(conn, titulo=titulo, email=email)
-        #test para as relações e para as views
-        target = post_esta_ativo(conn, titulo=titulo, email=email)
-        self.assertEqual(target, 0)
 
     #@unittest.skip('Em desenvolvimento.')
     def test_viu(self):
@@ -150,11 +135,72 @@ class TestCase(unittest.TestCase):
 
         #Teste que verifica se uma visualizacao foi inserida corretamente
         target = adiciona_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0], so="ubuntu", ip="192.168.0.1", browser="Internet Explorer")
-        self.assertIsNone(target)
 
         #Testa se e possivel encontrar a visualizacao
         target = acha_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0])
         self.assertIsNotNone(target)
+
+        #Testa se encontra uma visualizacao que nao existe
+        target = acha_viu(conn, email="ayres@email", id_post=post_id[0])
+        self.assertIsNone(target)
+
+    #@unittest.skip('Em desenvolvimento.')
+    def test_remove_post(self):
+        conn = self.__class__.connection
+        
+        titulo = "pudim amassado"
+        texto  = "era uma vez um pudim apaixonado por #dragões como o @ayres@linkadinho.inspermon.br"
+        url    = "https://i.ytimg.com/vi/vdBFctcEzOM/maxresdefault.jpg"
+        email  = "wesgas@al.insper.edu"
+        nome   = "André"
+        cidade = "Orlândia"
+        
+        adiciona_usuario(conn, nome=nome, email=email, cidade=cidade)
+        adiciona_usuario(conn, nome="ayrezard", email="ayres@linkadinho.inspermon.br",cidade="megadadolis")
+
+        adiciona_post(conn,titulo=titulo, texto=texto, url = url, email=email)
+        adiciona_post(conn,titulo="Novo post", texto=texto, url = url, email=email)
+
+        post_id = acha_post(conn, titulo=titulo, email=email)
+        target = adiciona_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0], so="ubuntu", ip="192.168.0.1", browser="Internet Explorer")
+        post_id = acha_post(conn, titulo="Novo post", email=email)
+        target = adiciona_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id[0], so="ubuntu", ip="192.168.0.1", browser="Internet Explorer")
+
+        target = acha_post(conn, titulo=titulo, email=email)
+        self.assertIsNotNone(target)
+        target = post_esta_ativo(conn, titulo=titulo, email=email)
+        self.assertEqual(target, 1)
+        
+        remove_post(conn, titulo=titulo, email=email)
+        #test para as relações e para as views
+        target = post_esta_ativo(conn, titulo=titulo, email=email)
+        self.assertEqual(target, 0)
+
+        post_id = acha_post_id(conn, titulo=titulo, email=email)
+        #Testa que se as tags dos usuarios foram desativadas
+        target = acha_shout(conn, post_id=post_id)
+        self.assertEqual(target[0][2], 0)
+
+        #Testa que se as tags dos passaros foram desativadas
+        target = acha_tag(conn, post_id=post_id)
+        self.assertEqual(target[0][2], 0)
+
+        #Testa se a visualizacao foi desativada
+        target = acha_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id)
+        self.assertEqual(target[6], 0)
+
+        post_id = acha_post_id(conn, titulo="Novo post", email=email)
+        #Testa que se as tags dos usuarios do post 2 seguem ativas
+        target = acha_shout(conn, post_id=post_id)
+        self.assertEqual(target[0][2], 1)
+
+        #Testa que se as tags dos passaros do post 2 seguem ativas
+        target = acha_tag(conn, post_id=post_id)
+        self.assertEqual(target[0][2], 1)
+
+        #Testa se a visualizacao do post 2 seguem ativas
+        target = acha_viu(conn, email="ayres@linkadinho.inspermon.br", id_post=post_id)
+        self.assertEqual(target[6], 1)
 
     #@unittest.skip('Em desenvolvimento.')
     def test_desable_all(self):
