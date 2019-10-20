@@ -207,3 +207,29 @@ def x_tbl_dvc_brwsr(conn):
             return (res)
         else:
             return None
+
+#Retorna uma linha de um post, mostrando o total de curtidas, nao curtidas
+# e indiferencas de um post especifico
+def total_likes_deslikes(conn,did):
+    with conn.cursor() as cursor:
+        cursor.execute('DROP TABLE IF EXISTS naocurtidas')
+        cursor.execute('DROP TABLE IF EXISTS curtidas')
+        cursor.execute('DROP TABLE IF EXISTS indiferentes')
+        cursor.execute('CREATE TEMPORARY TABLE naocurtidas SELECT id, COUNT(liked) \
+                        AS tnaocurtiu FROM post LEFT OUTER JOIN usuario_viu USING (id) WHERE\
+                        liked="nao curtiu" GROUP BY id')
+        cursor.execute('CREATE TEMPORARY TABLE curtidas\
+                        SELECT id, COUNT(liked) AS tcurtiu FROM post\
+                        INNER JOIN usuario_viu USING (id) WHERE liked="curtiu" GROUP BY id')
+        cursor.execute('CREATE TEMPORARY TABLE indiferentes\
+                        SELECT id, COUNT(liked) AS tindiferente FROM post\
+                        INNER JOIN usuario_viu USING (id) WHERE liked="indiferente" GROUP BY id')
+        cursor.execute('SELECT id, tcurtiu, tindiferente, tnaocurtiu\
+                        FROM usuario_viu uv LEFT OUTER JOIN curtidas USING (id)\
+                        LEFT OUTER JOIN indiferentes USING(id) LEFT OUTER JOIN\
+                        naocurtidas USING(id) WHERE id=%s GROUP BY id ORDER BY id',(did))
+        res = cursor.fetchone()
+        if res:
+            return (res)
+        else:
+            return None
