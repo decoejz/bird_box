@@ -177,6 +177,17 @@ def acha_shout(conn, post_id):
         else:
             return None
 
+def acha_shout_ao_usuario(conn, email):
+    with conn.cursor() as cursor:
+        cursor.execute(
+            '''SELECT titulo, texto, post.email  FROM
+	           usuario INNER JOIN tag_usuario USING(email) 
+               INNER JOIN post USING(id)''', (email, id))
+        res = cursor.fetchall()
+        if(res):
+            return res
+        else:
+            return None
 
 def adiciona_tag_usuario(conn, email, id):
     with conn.cursor() as cursor:
@@ -192,6 +203,7 @@ def acha_tag(conn, post_id):
             return res
         else:
             return None
+
 
 
 def adiciona_tag_passaro(conn, nome, id):
@@ -218,3 +230,13 @@ def x_tbl_dvc_brwsr(conn):
             return (res)
         else:
             return None
+
+def lista_view_populares(conn):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM pop_cidade')
+        res = cursor.fetchall()
+        if res:
+            return res
+        else:
+            return None
+

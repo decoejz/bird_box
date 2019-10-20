@@ -13,8 +13,6 @@ def run_query(connection, query, args=None):
             print(result)
 
 
-
-
 class Usuario(BaseModel):
     nome: str = None
     email: str
@@ -46,7 +44,7 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "BORA COMEÇAR ESSA BAGAÇA"}
 
 @app.post("/usuario")
 async def cria_usuario(usuario: Usuario, response: Response):
@@ -91,7 +89,7 @@ async def rm_post(post: Post, response: Response):
         response.status_code = 400
     return "sucessfully deleted post \"{}\"".format(post.titulo)
 
-##PROBLEMA...@ NA URL NÃO DA BOM
+
 @app.get("/post")
 async def pega_posts_de_usuario(usuario ,response: Response):
     try:    
@@ -103,11 +101,17 @@ async def pega_posts_de_usuario(usuario ,response: Response):
 
 @app.get("/usuario/populares")
 async def pega_usuarios_populares(response: Response):
-    
-    return "posts"
+    try:
+        populares = lista_view_populares(conn)
+        if(populares):
+            return populares
+    except pymysql.err.IntegrityError as e:
+        print(e)
+        return "error: {}".format(e)
 
-@app.get("/usuario/{usuario}/tags")
-async def pega_mencoes_ao_usuario(response: Response):
+@app.get("/usuario/tags")
+async def pega_mencoes_ao_usuario(usuario: Usuario,response: Response):
+    
     return "tags"
 
 @app.get("/stats")
@@ -117,5 +121,3 @@ async def pega_estatisticas(response: Response):
 @app.get("/passaro/imagens")
 async def pega_imagem_por_passaro(response: Response):
     return "dad"    
-
-print("Started")
