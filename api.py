@@ -3,16 +3,28 @@ from pydantic import BaseModel
 from starlette.responses import Response
 from projeto import *
 import json
+from functools import partial
+
+def run_query(connection, query, args=None):
+    with connection.cursor() as cursor:
+        print('Executando query:')
+        cursor.execute(query, args)
+        for result in cursor:
+            print(result)
+
+
+
 
 class Usuario(BaseModel):
-    nome: str
+    nome: str = None
     email: str
-    cidade: str
+    cidade: str = None
 
 class Post(BaseModel):
-    nome: str
+    titulo: str
+    texto: str = None
+    url: str = None
     email: str
-    cidade: str
 
 def setUp(config):
     print(config)
@@ -27,8 +39,10 @@ with open('config_testes.json') as f:
     config = json.load(f)
 conn = setUp(config)
 
+db = partial(run_query, conn)
 
 app = FastAPI()
+
 
 @app.get("/")
 async def root():
@@ -36,37 +50,60 @@ async def root():
 
 @app.post("/usuario")
 async def cria_usuario(usuario: Usuario, response: Response):
-    with conn.cursor() as cursor:
-        cursor.execute('START TRANSACTION')
+    db('START TRANSACTION')
     try:
         adiciona_usuario(conn, usuario.nome, usuario.email, usuario.cidade)
-        with conn.cursor() as cursor:
-            cursor.execute('COMMIT')
+        usr = acha_usuario(conn, usuario.nome)
+        db('COMMIT')
+        return usr
     except pymysql.err.IntegrityError as e:
         print(e)
-        with conn.cursor() as cursor:
-            cursor.execute('ROLLBACK')
+        db('ROLLBACK')
         response.status_code = 400
         return "algum erro aconteceu", "{}".format(e)
     
-    return 200, usuario
-
 
 @app.post("/post")
 async def add_post(post: Post, response: Response):
-    return post
+    db('START TRANSACTION')
+    try:
+        tags_added = adiciona_post(conn, post.titulo, post.texto, post.url, post.email)
+        
+        db_post = acha_post(conn, post.titulo, post.email)
+        db('COMMIT')
+    except pymysql.err.IntegrityError as e:
+        print(e)
+        db('ROLLBACK')
+        response.status_code = 400
+        return "Algum erro aconteceu:", "{}".format(e)
+    
+    return db_post,tags_added
 
 
 @app.delete("/post")
 async def rm_post(post: Post, response: Response):
-    return "isso"
+    db('START TRANSACTION')
+    try:    
+        remove_post(conn, post.titulo, post.email)
+    except pymysql.err.IntegrityError as e:
+        print(e)
+        db('ROLLBACK')
+        response.status_code = 400
+    return "sucessfully deleted post \"{}\"".format(post.titulo)
 
-@app.get("/post/{usuario}")
-async def pega_posts_de_usuario(response: Response):
-    return "posts"
+##PROBLEMA...@ NA URL NÃO DA BOM
+@app.get("/post")
+async def pega_posts_de_usuario(usuario ,response: Response):
+    try:    
+        posts = lista_post_de_usuario(conn, usuario.email)
+    except pymysql.err.IntegrityError as e:
+        print(e)
+    return posts
+
 
 @app.get("/usuario/populares")
 async def pega_usuarios_populares(response: Response):
+    
     return "posts"
 
 @app.get("/usuario/{usuario}/tags")
@@ -80,3 +117,5 @@ async def pega_estatisticas(response: Response):
 @app.get("/passaro/imagens")
 async def pega_imagem_por_passaro(response: Response):
     return "dad"    
+
+print("Started")

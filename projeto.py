@@ -15,7 +15,7 @@ def acha_usuario(conn, nome):
         cursor.execute('SELECT email FROM usuario WHERE nome = %s', (nome))
         res = cursor.fetchone()
         if res:
-            return res[0]
+            return res
         else:
             return None
 
@@ -138,6 +138,17 @@ def acha_post_id(conn, titulo, email):
         res = cursor.fetchone()
         if res:
             return res[0]
+        else:
+            return None
+
+def lista_post_de_usuario(conn, email):
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "SELECT titulo, texto FROM post WHERE email=%s",email
+        )
+        res = cursor.fetchall()
+        if res:
+            return res
         else:
             return None
 
