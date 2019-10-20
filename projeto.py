@@ -82,8 +82,6 @@ def acha_viu(conn, email, id_post):
             return None
 
 # ACOES RELACIONADAS A POSTS
-
-
 def parser_texto(conn, texto, id):
     # Separa cada palavra do comentario para ser parseada e procurar as tags
     added = {"#": [], "@": []}
@@ -189,3 +187,12 @@ def adiciona_tag_passaro(conn, nome, id):
     with conn.cursor() as cursor:
         cursor.execute('INSERT INTO tag_passaro (nome, id)\
                  VALUES (%s, %s)', (nome, id))
+
+def lista_posts_novos(conn,email):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT titulo, texto, url FROM post WHERE email=%s ORDER BY data_post DESC',(email))
+    res = cursor.fetchall()
+    if res:
+        return res
+    else:
+        return None
