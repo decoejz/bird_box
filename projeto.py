@@ -82,8 +82,6 @@ def acha_viu(conn, email, id_post):
             return None
 
 # ACOES RELACIONADAS A POSTS
-
-
 def parser_texto(conn, texto, id):
     # Separa cada palavra do comentario para ser parseada e procurar as tags
     added = {"#": [], "@": []}
@@ -200,3 +198,23 @@ def adiciona_tag_passaro(conn, nome, id):
     with conn.cursor() as cursor:
         cursor.execute('INSERT INTO tag_passaro (nome, id)\
                  VALUES (%s, %s)', (nome, id))
+
+#Posts do usuário em ordem cronológica reversa
+def lista_posts_novos(conn,email):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT titulo, texto, url FROM post WHERE email=%s ORDER BY data_post DESC',(email))
+        res = cursor.fetchall()
+        if res:
+            return res
+        else:
+            return None
+
+#Tabela cruzada de quantidade de aparelhos por tipo e por browser
+def x_tbl_dvc_brwsr(conn):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT browser, so, COUNT(so) total FROM usuario_viu GROUP BY browser, so')
+        res = cursor.fetchall()
+        if res:
+            return (res)
+        else:
+            return None

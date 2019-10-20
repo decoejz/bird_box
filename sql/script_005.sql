@@ -2,8 +2,7 @@ USE bird_box;
 
 ALTER TABLE post
     ADD COLUMN (
-        likes INT NOT NULL DEFAULT 0,
-        deslikes INT NOT NULL DEFAULT 0
+        data_post TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
 ALTER TABLE usuario_viu
