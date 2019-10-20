@@ -8,6 +8,8 @@ CREATE VIEW pop_cidade AS
         FROM usuario 
         INNER JOIN post USING (email)
         INNER JOIN usuario_viu USING (id)
+        WHERE 
+            post.ativo = 1
         GROUP BY usuario_viu.id) AS mv
     GROUP BY mv.cidade
     ORDER BY mv.cidade;

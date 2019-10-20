@@ -17,14 +17,14 @@ INSERT INTO preferencia (email, nome) VALUES ("manuemmail","pas2"),("use5@mail.c
 
 INSERT INTO post (titulo, texto,email, url) VALUES ("Historinha","Era uma @decoejz avez...","manuemmail","google.img/canario");
 INSERT INTO post (titulo, texto,email, url) VALUES ("Tardis","Era uma @use3@mail.com um passaro chamado #beija-flor que gosta de voar.","use1@mail.com","linkedin.passaros.com");
-INSERT INTO post (titulo, texto,email, url) VALUES ("Um pais da europa","Tirou o @davide@mail.com na copa dos #sabia","use3@mail.com","facebook.copinha.org.br");
+INSERT INTO post (titulo, texto,email, url) VALUES ("Um pais da europa","Tirou o @decoejz na copa dos #sabia","use3@mail.com","facebook.copinha.org.br");
 
 INSERT INTO usuario_viu (email,id,so,ip,browser) VALUES ("davide@mail.com",1,"WINDOWS","192.168.1.1","Chorme");
 INSERT INTO usuario_viu (email,id,so,ip,browser) VALUES ("decoejz",2,"UBUNTU","1.2.3.4","Internet Explorer");
 INSERT INTO usuario_viu (email,id,so,ip,browser,liked) VALUES ("manuemmail",2,"WINDOWS","18.18.18.18","Internet Explorer","curtiu");
 INSERT INTO usuario_viu (email,id,so,ip,browser,liked) VALUES ("use6@mail.com",2,"MACOS","192.168.0.1","Firefox","curtiu");
 INSERT INTO usuario_viu (email,id,so,ip,browser,liked) VALUES ("use1@mail.com",2,"WINDOWS","19.16.1.1","Internet Explorer","nao curtiu");
-INSERT INTO usuario_viu (email,id,so,ip,browser,liked) VALUES ("use4@mail.com",3,"MACOS","19.0.1.1","Safari","nao curtiu");
+INSERT INTO usuario_viu (email,id,so,ip,browser,liked) VALUES ("use4@mail.com",1,"MACOS","19.0.1.1","Safari","nao curtiu");
 
 INSERT INTO tag_passaro (nome, id) VALUES ("canario",1),("beija-flor",2),("pas2",2),("sabia",3);
 

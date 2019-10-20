@@ -111,13 +111,24 @@ async def pega_usuarios_populares(response: Response):
 
 @app.get("/usuario/tags")
 async def pega_mencoes_ao_usuario(usuario: Usuario,response: Response):
-    
-    return "tags"
+    shouts = acha_shout_ao_usuario(conn, usuario.email)
+    if(shouts):
+        return shouts
+    else:
+        return ""
 
 @app.get("/stats")
 async def pega_estatisticas(response: Response):
-    return "tags"   
+    stat = x_tbl_dvc_brwsr(conn)
+    if(stat):
+        return stat
+    else:
+        return ""
 
 @app.get("/passaro/imagens")
 async def pega_imagem_por_passaro(response: Response):
-    return "dad"    
+    links = pega_passaro_imagens(conn)
+    if(links):
+        return links
+    else:
+        return ""

@@ -112,7 +112,7 @@ def lista_post(conn):
 def acha_post(conn, titulo, email):
     with conn.cursor() as cursor:
         cursor.execute(
-            "SELECT * FROM post WHERE titulo=%s AND email=%s", (titulo, email))
+            "SELECT * FROM post WHERE titulo=%s AND email=%s AND ativo=1", (titulo, email))
         res = cursor.fetchone()
         if res:
             return res
@@ -144,7 +144,7 @@ def acha_post_id(conn, titulo, email):
 def lista_post_de_usuario(conn, email):
     with conn.cursor() as cursor:
         cursor.execute(
-            "SELECT titulo, texto FROM post WHERE email=%s",email
+            "SELECT titulo, texto FROM post WHERE email=%s and ativo=1",email
         )
         res = cursor.fetchall()
         if res:
@@ -182,7 +182,7 @@ def acha_shout_ao_usuario(conn, email):
         cursor.execute(
             '''SELECT titulo, texto, post.email  FROM
 	           usuario INNER JOIN tag_usuario USING(email) 
-               INNER JOIN post USING(id)''', (email, id))
+               INNER JOIN post USING(id) WHERE usuario.email=%s AND post.ativo=1''', email)
         res = cursor.fetchall()
         if(res):
             return res
@@ -214,7 +214,7 @@ def adiciona_tag_passaro(conn, nome, id):
 #Posts do usuário em ordem cronológica reversa
 def lista_posts_novos(conn,email):
     with conn.cursor() as cursor:
-        cursor.execute('SELECT titulo, texto, url FROM post WHERE email=%s ORDER BY data_post DESC',(email))
+        cursor.execute('SELECT titulo, texto, url FROM post WHERE email=%s AND post.ativo=1 ORDER BY data_post DESC',(email))
         res = cursor.fetchall()
         if res:
             return res
@@ -263,5 +263,16 @@ def total_likes_deslikes(conn,did):
         res = cursor.fetchone()
         if res:
             return (res)
+        else:
+            return None
+
+def pega_passaro_imagens(conn):
+    with conn.cursor() as cursor:
+        cursor.execute("""SELECT passaro.nome, url FROM 
+	                       passaro INNER JOIN tag_passaro USING(nome)
+                           INNER JOIN post USING(id)""")
+        res = cursor.fetchall()
+        if(res):
+            return res
         else:
             return None
