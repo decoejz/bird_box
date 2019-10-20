@@ -3,6 +3,11 @@ import pymysql
 
 # ACOES RELACIONADAS AO USUARIO
 
+liked_mapping={
+    "-1":"nao curtiu",
+    "0": "indiferente",
+    "1": "curtiu"
+}
 
 def adiciona_usuario(conn, nome, email, cidade):
     with conn.cursor() as cursor:
@@ -65,10 +70,11 @@ def acha_preferencia(conn, email, passaro):
 
 
 # ACOES RELACIONADAS AS VISUALIZACOES
-def adiciona_viu(conn, email, id_post, so, ip, browser):
+def adiciona_viu(conn, email, id_post, so, ip, browser, reacao = 0):
+    liked = liked_mapping[reacao]
     with conn.cursor() as cursor:
-        cursor.execute('INSERT INTO usuario_viu (email, id, so, ip, browser)\
-                 VALUES (%s, %s, %s, %s, %s)', (email, id_post, so, ip, browser))
+        cursor.execute('INSERT INTO usuario_viu (email, id, so, ip, browser, liked)\
+                 VALUES (%s, %s, %s, %s, %s, %s)', (email, id_post, so, ip, browser, liked))
 
 
 def acha_viu(conn, email, id_post):
@@ -144,7 +150,7 @@ def acha_post_id(conn, titulo, email):
 def lista_post_de_usuario(conn, email):
     with conn.cursor() as cursor:
         cursor.execute(
-            "SELECT titulo, texto FROM post WHERE email=%s and ativo=1",email
+            "SELECT id,titulo, texto FROM post WHERE email=%s and ativo=1",email
         )
         res = cursor.fetchall()
         if res:

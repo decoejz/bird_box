@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.responses import Response
+from starlette.requests import Request
 from projeto import *
 import json
 from functools import partial
@@ -23,6 +24,10 @@ class Post(BaseModel):
     texto: str = None
     url: str = None
     email: str
+
+class Vista(BaseModel):
+    so: str
+    liked: str
 
 def setUp(config):
     print(config)
@@ -49,6 +54,9 @@ async def root():
 @app.post("/usuario")
 async def cria_usuario(usuario: Usuario, response: Response):
     db('START TRANSACTION')
+    if(not usuario.cidade or not usuario.nome):
+        response.status_code = 400
+        return "missing parameters"
     try:
         adiciona_usuario(conn, usuario.nome, usuario.email, usuario.cidade)
         usr = acha_usuario(conn, usuario.nome)
@@ -57,7 +65,7 @@ async def cria_usuario(usuario: Usuario, response: Response):
     except pymysql.err.IntegrityError as e:
         print(e)
         db('ROLLBACK')
-        response.status_code = 400
+        response.status_code = 409
         return "algum erro aconteceu", "{}".format(e)
     
 
@@ -72,7 +80,7 @@ async def add_post(post: Post, response: Response):
     except pymysql.err.IntegrityError as e:
         print(e)
         db('ROLLBACK')
-        response.status_code = 400
+        response.status_code = 409
         return "Algum erro aconteceu:", "{}".format(e)
     
     return db_post,tags_added
@@ -86,17 +94,31 @@ async def rm_post(post: Post, response: Response):
     except pymysql.err.IntegrityError as e:
         print(e)
         db('ROLLBACK')
-        response.status_code = 400
+        response.status_code = 500
     return "sucessfully deleted post \"{}\"".format(post.titulo)
 
 
-@app.get("/post")
-async def pega_posts_de_usuario(usuario ,response: Response):
+@app.get("/usuario/post")
+async def pega_posts_de_usuario(usuario: Usuario,response: Response):
     try:    
         posts = lista_post_de_usuario(conn, usuario.email)
     except pymysql.err.IntegrityError as e:
         print(e)
+        response.status_code = 500
     return posts
+
+
+@app.post("/post/ver/{id_post}")
+async def ver_post(usuario: Usuario,id_post: str, visao: Vista, response: Response, request: Request):
+    client_ip = str(request.client.host)
+    browser = request.headers['User-Agent'][:19]
+    try:
+        adiciona_viu(conn, usuario.email, id_post, visao.so, client_ip, browser, visao.liked)
+    except pymysql.err.IntegrityError as e:
+        print(e)
+        response.status_code = 500
+    
+    return "success"
 
 
 @app.get("/usuario/populares")
